@@ -16,16 +16,11 @@ def remove_accents(input_str):
 
 class FileProcessor:
     def __init__(self, status_callback, finish_callback, strings):
-        load_dotenv()
-        self.api_key = os.getenv("GEMINI_API_KEY")
+        self.api_key = "AIzaSyCQiaoJwDoLGC7uErK_U5doaFdN7JkcKzQ"
         self.status_callback = status_callback
         self.finish_callback = finish_callback
         self.s = strings
-        
-        if self.api_key:
-            self.client = genai.Client(api_key=self.api_key)
-        else:
-            self.client = None
+        self.client = genai.Client(api_key=self.api_key)
 
     def get_unique_path(self, path):
         """Si el archivo existe, añade (1), (2), etc."""

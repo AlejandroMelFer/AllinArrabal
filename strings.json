@@ -16,14 +16,9 @@
     "error_max_params": "No se permiten más de 5 parámetros.",
     "warning_title": "Límite alcanzado",
     "file_dialog_filter": "Archivos soportados",
-
-
     "btn_add_param": "Añadir parametro",
     "btn_clear_list": "Limpiar Lista",
     "help_label": "ⓘ",
     "help_tooltip": "Estos parametros sirven para filtrar el contenido que hay dentro del archivo.\nEn caso de no encontrarlo, no aparecera.\nEn caso contrario, formara parte del nombre del archivo.",
-
     "ai_prompt": "Analyze this document or image of an enrollment form. Extract these fields: {fields}. Respond strictly in JSON format with these keys: {{ {json_keys} }}. If you cannot find a value, use an empty string \"\" for that specific key. Do not add any explanations or extra text."
-
 }
-

@@ -62,27 +62,6 @@ class AllinArrabalGUI(TkinterDnDCTk):
 
         self.set_icon()
 
-    def set_icon(self):
-        icon_path = resource_path(os.path.join("assets", "ODF.ico"))
-        if os.path.exists(icon_path):
-
-            try:
-                from PIL import Image, ImageTk
-                # Cargar el icono con PIL para mayor compatibilidad
-                img = Image.open(icon_path)
-                photo = ImageTk.PhotoImage(img)
-                
-                # Aplicar el icono de múltiples formas para asegurar la barra de tareas
-                self.wm_iconphoto(True, photo)
-                self.iconphoto(True, photo)
-                self.iconbitmap(os.path.abspath(icon_path))
-                
-                # Guardar referencia para evitar el Garbage Collector
-                self._icon_ref = photo
-            except Exception as e:
-                print(f"No se pudo cargar el icono: {e}")
-
-
         self.label_title = ctk.CTkLabel(self, text="AllinArrabal", font=ctk.CTkFont(size=24, weight="bold"))
         self.label_title.pack(pady=(20, 10))
 
@@ -164,6 +143,26 @@ class AllinArrabalGUI(TkinterDnDCTk):
                                        fg_color="#555555", hover_color="#444444", font=ctk.CTkFont(weight="bold"))
         self.btn_clear.pack(side="right", fill="x", expand=True, padx=(5, 0))
 
+
+    def set_icon(self):
+        icon_path = resource_path(os.path.join("assets", "ODF.ico"))
+        if os.path.exists(icon_path):
+
+            try:
+                from PIL import Image, ImageTk
+                # Cargar el icono con PIL para mayor compatibilidad
+                img = Image.open(icon_path)
+                photo = ImageTk.PhotoImage(img)
+                
+                # Aplicar el icono de múltiples formas para asegurar la barra de tareas
+                self.wm_iconphoto(True, photo)
+                self.iconphoto(True, photo)
+                self.iconbitmap(os.path.abspath(icon_path))
+                
+                # Guardar referencia para evitar el Garbage Collector
+                self._icon_ref = photo
+            except Exception as e:
+                print(f"No se pudo cargar el icono: {e}")
 
 
     def add_param_ui(self, default_text=""):
@@ -295,4 +294,3 @@ class AllinArrabalGUI(TkinterDnDCTk):
         self.is_processing = False
         self.refresh_file_list(getattr(self, '_file_statuses', {}))
         self.btn_run.configure(state="normal", text=self.s["btn_start"])
-
