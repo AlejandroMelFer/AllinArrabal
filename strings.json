@@ -1,0 +1,29 @@
+{
+    "app_title": "AllinArrabal - Extraccion y Renombrado",
+    "prefix_label": "Prefijo:",
+    "placeholder_prefix": "Ej: VTV2026.3",
+    "btn_start": "Iniciar Procesamiento",
+    "btn_processing": "Procesando...",
+    "error_api_key": "ERROR: No se encontro la API Key en el archivo .env",
+    "drop_zone_default": "📁\n\nArrastra aquí tus archivos\no haz clic para explorar",
+    "drop_zone_active": "📁\n\n{count} archivos seleccionados.\nArrastra más o haz clic para explorar",
+    "file_status_waiting": "{filename}",
+    "file_status_processing": "Procesando...",
+    "file_status_done": "Renombrado a {new_name}",
+    "file_status_error": "Error: {error}",
+    "error_no_files": "Por favor, selecciona al menos un archivo.",
+    "error_not_file": "Error: El elemento no es un archivo valido.",
+    "error_max_params": "No se permiten más de 5 parámetros.",
+    "warning_title": "Límite alcanzado",
+    "file_dialog_filter": "Archivos soportados",
+
+
+    "btn_add_param": "Añadir parametro",
+    "btn_clear_list": "Limpiar Lista",
+    "help_label": "ⓘ",
+    "help_tooltip": "Estos parametros sirven para filtrar el contenido que hay dentro del archivo.\nEn caso de no encontrarlo, no aparecera.\nEn caso contrario, formara parte del nombre del archivo.",
+
+    "ai_prompt": "Analyze this document or image of an enrollment form. Extract these fields: {fields}. Respond strictly in JSON format with these keys: {{ {json_keys} }}. If you cannot find a value, use an empty string \"\" for that specific key. Do not add any explanations or extra text."
+
+}
+

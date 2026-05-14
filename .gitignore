@@ -1,0 +1,17 @@
+# Entorno virtual
+venv/
+.venv/
+env/
+
+# Variables de entorno (SECRETOS)
+.env
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribución / Instalación
+dist/
+build/
+*.exe
