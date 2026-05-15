@@ -16,7 +16,7 @@ def remove_accents(input_str):
 
 class FileProcessor:
     def __init__(self, status_callback, finish_callback, strings):
-        self.api_key = "AIzaSyCQiaoJwDoLGC7uErK_U5doaFdN7JkcKzQ"
+        self.api_key = "AIzaSyB-NAPti6oCfgbddVaslNM6Y2E4efaNUVw"
         self.status_callback = status_callback
         self.finish_callback = finish_callback
         self.s = strings
