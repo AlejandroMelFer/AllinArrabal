@@ -1,12 +1,11 @@
 import json
 import os
 import ctypes
-from gui import AllinArrabalGUI
-from processor import FileProcessor
+from views.gui import AllinArrabalGUI
+from logic.processor import FileProcessor
 import sys
 
 def resource_path(relative_path):
-    """ Obtiene la ruta absoluta de los recursos, compatible con PyInstaller """
     try:
         base_path = sys._MEIPASS
     except Exception:
@@ -31,15 +30,18 @@ def main():
     processor = None
     
     def handle_start(path, prefix, params):
-        processor.start_processing(path, prefix, params)
+        processor.start_processing(path, prefix, params, app.update_rename_status, app.unlock_ui)
 
-    app = AllinArrabalGUI(start_callback=handle_start, strings=strings)
+    def handle_extract(path, params):
+        processor.start_extracting(path, params, app.update_extract_status, app.unlock_extract_ui)
 
-    processor = FileProcessor(
-        status_callback=app.update_file_status, 
-        finish_callback=app.unlock_ui,
+    app = AllinArrabalGUI(
+        start_callback=handle_start, 
+        start_extract_callback=handle_extract, 
         strings=strings
     )
+
+    processor = FileProcessor(strings=strings)
 
 
     app.mainloop()

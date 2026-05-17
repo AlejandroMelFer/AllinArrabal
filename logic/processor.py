@@ -8,22 +8,18 @@ from dotenv import load_dotenv
 import unicodedata
 import zipfile
 
-
 def remove_accents(input_str):
     nfkd_form = unicodedata.normalize('NFKD', input_str)
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
 class FileProcessor:
-    def __init__(self, status_callback, finish_callback, strings):
+    def __init__(self, strings):
         self.api_key = "AIzaSyB-NAPti6oCfgbddVaslNM6Y2E4efaNUVw"
-        self.status_callback = status_callback
-        self.finish_callback = finish_callback
         self.s = strings
         self.client = genai.Client(api_key=self.api_key)
 
     def get_unique_path(self, path):
-        """Si el archivo existe, añade (1), (2), etc."""
         if not os.path.exists(path):
             return path
         
@@ -33,14 +29,14 @@ class FileProcessor:
             counter += 1
         return f"{base} ({counter}){ext}"
 
-    def start_processing(self, files_list, prefix, params):
-        thread = threading.Thread(target=self._run, args=(files_list, prefix, params))
+    def start_processing(self, files_list, prefix, params, status_cb, finish_cb):
+        thread = threading.Thread(target=self._run, args=(files_list, prefix, params, status_cb, finish_cb))
         thread.daemon = True
         thread.start()
 
-    def _run(self, files_list, prefix, params):
+    def _run(self, files_list, prefix, params, status_cb, finish_cb):
         if not files_list:
-            self.finish_callback()
+            finish_cb()
             return
 
         renamed_files = []
@@ -48,18 +44,18 @@ class FileProcessor:
         for index, file_path in enumerate(files_list):
             filename = os.path.basename(file_path)
             folder_path = os.path.dirname(file_path)
-            self.status_callback(file_path, "START", False)
+            status_cb(file_path, "START", False)
 
             if not params:
                 # No parameters, do not rename
-                self.status_callback(file_path, file_path, False)
+                status_cb(file_path, file_path, False)
                 continue
 
             try:
                 # Construir el prompt dinámico
                 fields_str = ", ".join(params)
                 json_keys_str = ", ".join([f'"{p}": "..."' for p in params])
-                prompt = self.s["ai_prompt"].format(fields=fields_str, json_keys=json_keys_str)
+                prompt = self.s["ai_prompt_renombre"].format(fields=fields_str, json_keys=json_keys_str)
                 
                 extension = os.path.splitext(filename)[1].lower()
 
@@ -70,18 +66,6 @@ class FileProcessor:
                         model='gemini-flash-latest',
                         contents=[prompt, uploaded_file]
                     )
-                else:
-                    m_type = "image/jpeg" if extension in [".jpg", ".jpeg"] else "image/png"
-                    with open(file_path, 'rb') as f:
-                        uploaded_file = self.client.files.upload(file=f, config={'mime_type': m_type})
-                    
-                    response = self.client.models.generate_content(
-                        model='gemini-flash-latest',
-                        contents=[prompt, uploaded_file]
-                    )
-
-
-                
                 text_response = response.text
                 json_str = text_response.replace('```json', '').replace('```', '').strip()
                 data = json.loads(json_str)
@@ -101,7 +85,6 @@ class FileProcessor:
 
                 new_name = f"{prefix}{full_name}{extension}"
 
-
                 new_path = os.path.join(folder_path, new_name)
                 
                 # Solo renombramos si el nombre es distinto al original
@@ -109,20 +92,18 @@ class FileProcessor:
                     # Asegurar nombre único tipo Windows si choca con OTRO archivo
                     new_path = self.get_unique_path(new_path)
                     os.rename(file_path, new_path)
-                    self.status_callback(file_path, new_path, False)
+                    status_cb(file_path, new_path, False)
                 else:
                     # Si el nombre es el mismo, lo marcamos como éxito sin mover nada
-                    self.status_callback(file_path, file_path, False)
+                    status_cb(file_path, file_path, False)
                 
                 renamed_files.append(new_path)
-
-
 
                 if index < len(files_list) - 1:
                     time.sleep(4) 
 
             except Exception as e:
-                self.status_callback(file_path, str(e), True)
+                status_cb(file_path, str(e), True)
 
         if renamed_files:
             try:
@@ -142,4 +123,67 @@ class FileProcessor:
             except Exception as e:
                 print(f"Error al crear el zip: {e}")
 
-        self.finish_callback()
+        finish_cb()
+
+    def start_extracting(self, files_list, params, status_cb, finish_cb):
+        thread = threading.Thread(target=self._run_extraction, args=(files_list, params, status_cb, finish_cb))
+        thread.daemon = True
+        thread.start()
+
+    def _run_extraction(self, files_list, params, status_cb, finish_cb):
+        if not files_list:
+            finish_cb([])
+            return
+
+        extracted_rows = []
+        total = len(files_list)
+        success_count = 0
+
+        for index, file_path in enumerate(files_list):
+            filename = os.path.basename(file_path)
+            status_cb(file_path, "START", False)
+
+            if not params:
+                status_cb(file_path, self.s["status_no_columns"], True)
+                continue
+
+            try:
+                # 1. Construir el prompt dinámico
+                fields_str = ", ".join(params)
+                json_keys_str = ", ".join([f'"{p}": "..."' for p in params])
+                prompt = self.s["ai_prompt_extraccion"].format(fields=fields_str, json_keys=json_keys_str)
+
+                # 2. Subir PDF a Gemini
+                with open(file_path, 'rb') as f:
+                    uploaded_file = self.client.files.upload(file=f, config={'mime_type': 'application/pdf'})
+
+                # 3. Llamar al modelo de IA
+                response = self.client.models.generate_content(
+                    model='gemini-flash-latest',
+                    contents=[prompt, uploaded_file]
+                )
+
+                text_response = response.text
+                json_str = text_response.replace('```json', '').replace('```', '').strip()
+                data = json.loads(json_str)
+
+                # Guardar fila de datos en memoria (manteniendo acentos originales)
+                row_data = {}
+                for p in params:
+                    row_data[p] = str(data.get(p, "")).strip()
+
+                if "_options" in data:
+                    row_data["_options"] = data["_options"]
+
+                extracted_rows.append(row_data)
+                success_count += 1
+                status_cb(file_path, self.s["status_extracted"].format(current=success_count, total=total), False)
+
+                # 4. Evitar límites de cuota (sleep de 4s entre llamadas)
+                if index < len(files_list) - 1:
+                    time.sleep(4)
+
+            except Exception as e:
+                status_cb(file_path, str(e), True)
+
+        finish_cb(extracted_rows)
