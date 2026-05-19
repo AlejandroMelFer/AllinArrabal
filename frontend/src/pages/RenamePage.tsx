@@ -108,7 +108,7 @@ export default function RenamePage() {
             + Añadir
           </button>
         </div>
-        <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+        <div className="space-y-2 max-h-40 overflow-y-auto px-1 py-0.5">
           {params.map((p, i) => (
             <ParamRow
               key={i}
@@ -139,7 +139,7 @@ export default function RenamePage() {
         <div className="flex-1 min-h-0">
           <DropZone files={files} onFilesChange={setFiles} disabled={processing} label="Arrastra archivos PDF aquí">
             {files.length > 0 && (
-              <div className="space-y-1 pr-1">
+              <div className="space-y-1 px-1 py-0.5">
                 {files.map((f) => {
                   const st = statusMap[f];
                   let badgeStatus: 'idle' | 'processing' | 'done' | 'error' = 'idle';

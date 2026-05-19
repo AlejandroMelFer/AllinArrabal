@@ -3,7 +3,7 @@ from google import genai
 from dotenv import load_dotenv
 
 load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
+api_key = "AIzaSyB-NAPti6oCfgbddVaslNM6Y2E4efaNUVw"
 
 if not api_key:
     print("ERROR: No se encontro la API Key en el archivo .env")
@@ -15,7 +15,7 @@ print("Intentando conectar con Gemini...")
 
 try:
     response = client.models.generate_content(
-        model='gemini-flash-latest',
+        model='gemini-2.5-flash-lite',
         contents="Dime: 'Conexion exitosa con el nuevo motor de AllinArrabal'"
     )
 

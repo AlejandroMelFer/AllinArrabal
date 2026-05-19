@@ -70,7 +70,7 @@ class FileProcessor:
                     with open(file_path, 'rb') as f:
                         uploaded_file = self.client.files.upload(file=f, config={'mime_type': 'application/pdf'})
                     response = self.client.models.generate_content(
-                        model='gemini-flash-latest',
+                        model='gemini-2.5-flash-lite',
                         contents=[prompt, uploaded_file]
                     )
                 text_response = response.text
@@ -166,7 +166,7 @@ class FileProcessor:
 
                 # 3. Llamar al modelo de IA
                 response = self.client.models.generate_content(
-                    model='gemini-flash-latest',
+                    model='gemini-2.5-flash-lite',
                     contents=[prompt, uploaded_file]
                 )
 
