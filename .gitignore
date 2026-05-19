@@ -15,3 +15,7 @@ __pycache__/
 dist/
 build/
 *.exe
+
+# Depuración de Word
+debug_table.txt
+

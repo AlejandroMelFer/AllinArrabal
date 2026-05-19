@@ -29,12 +29,12 @@ class FileProcessor:
             counter += 1
         return f"{base} ({counter}){ext}"
 
-    def start_processing(self, files_list, prefix, params, status_cb, finish_cb):
-        thread = threading.Thread(target=self._run, args=(files_list, prefix, params, status_cb, finish_cb))
+    def start_processing(self, files_list, prefix, params, status_cb, finish_cb, completed_map=None):
+        thread = threading.Thread(target=self._run, args=(files_list, prefix, params, status_cb, finish_cb, completed_map))
         thread.daemon = True
         thread.start()
 
-    def _run(self, files_list, prefix, params, status_cb, finish_cb):
+    def _run(self, files_list, prefix, params, status_cb, finish_cb, completed_map=None):
         if not files_list:
             finish_cb()
             return
@@ -44,6 +44,13 @@ class FileProcessor:
         for index, file_path in enumerate(files_list):
             filename = os.path.basename(file_path)
             folder_path = os.path.dirname(file_path)
+
+            if completed_map and file_path in completed_map:
+                new_path = completed_map[file_path]
+                status_cb(file_path, new_path, False)
+                renamed_files.append(new_path)
+                continue
+
             status_cb(file_path, "START", False)
 
             if not params:
@@ -169,6 +176,7 @@ class FileProcessor:
 
                 # Guardar fila de datos en memoria (manteniendo acentos originales)
                 row_data = {}
+                row_data["_file_path"] = file_path
                 for p in params:
                     row_data[p] = str(data.get(p, "")).strip()
 

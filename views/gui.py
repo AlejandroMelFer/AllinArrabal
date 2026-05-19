@@ -35,7 +35,7 @@ class AllinArrabalGUI(TkinterDnDCTk):
         self.sidebar_frame.pack(side="left", fill="y")
         
         # Icono 1: Renombrar
-        rename_icon_path = resource_path(os.path.join("assets", "Renombrar.png"))
+        rename_icon_path = resource_path(os.path.join("assets", "Renombre.jpeg"))
         self.rename_icon = None
         if os.path.exists(rename_icon_path):
             try:
@@ -52,7 +52,7 @@ class AllinArrabalGUI(TkinterDnDCTk):
         self.btn_rename_feature.pack(pady=(20, 10), padx=10)
 
         # Icono 2: Extraer Excel
-        extract_excel_icon_path = resource_path(os.path.join("assets", "Extraer_Excel.png"))
+        extract_excel_icon_path = resource_path(os.path.join("assets", "DocToSheet.jpeg"))
         self.extract_excel_icon = None
         if os.path.exists(extract_excel_icon_path):
             try:
@@ -69,7 +69,7 @@ class AllinArrabalGUI(TkinterDnDCTk):
         self.btn_extract_excel_feature.pack(pady=10, padx=10)
 
         # Icono 3: Extraer Word
-        extract_word_icon_path = resource_path(os.path.join("assets", "Extraer_Word.png"))
+        extract_word_icon_path = resource_path(os.path.join("assets", "DocToText.jpeg"))
         self.extract_word_icon = None
         if os.path.exists(extract_word_icon_path):
             try:

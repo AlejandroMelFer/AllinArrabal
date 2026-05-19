@@ -31,6 +31,24 @@ class WordLogic:
     @staticmethod
     def extract_placeholders(docx_path):
         doc = Document(docx_path)
+        
+        # Guardar depuración en un archivo local para poder leer la estructura de tablas directamente
+        try:
+            debug_path = os.path.join(os.getcwd(), "debug_table.txt")
+            with open(debug_path, "w", encoding="utf-8") as df:
+                df.write("--- DEBUG WORD TABLES START ---\n")
+                for table_idx, table in enumerate(doc.tables):
+                    df.write(f"Table {table_idx}:\n")
+                    for row_idx, row in enumerate(table.rows):
+                        cells_strs = []
+                        for col_idx, cell in enumerate(row.cells):
+                            # Limpiar saltos de línea para ver en una sola línea en la depuración
+                            clean_cell_text = cell.text.replace('\n', ' ').replace('\r', '')
+                            cells_strs.append(f"C{col_idx}:'{clean_cell_text}'")
+                        df.write(f"  R{row_idx}: {' | '.join(cells_strs)}\n")
+        except Exception as e:
+            print(f"Error al escribir debug_table.txt: {e}")
+
         placeholders = []
         placeholders_map = {}
         regex_placeholders = set()
