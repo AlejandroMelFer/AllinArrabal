@@ -194,6 +194,12 @@ class WordLogic:
                 
                 out_filename = f"Ficha_{nombre}_{apellido}".strip("_") + ".docx" if nombre or apellido else f"Documento_Extraido_{idx + 1}.docx"
                 out_filename = "".join(c for c in out_filename if c.isalnum() or c in "._- ")
+                
+                base, ext = os.path.splitext(out_filename)
+                counter = 1
+                while os.path.exists(os.path.join(temp_dir, out_filename)):
+                    out_filename = f"{base} ({counter}){ext}"
+                
                 temp_file_path = os.path.join(temp_dir, out_filename)
 
                 doc = Document(template_path)

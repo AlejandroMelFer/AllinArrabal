@@ -174,6 +174,34 @@ class AllinArrabalAPI:
         if self._window:
             self._window.minimize()
 
+    def toggle_maximize_window(self):
+        """Toggle between maximized and normal window state."""
+        try:
+            import ctypes
+            hwnd = int(self._window.native.Handle.ToInt64())
+            SW_SHOWMAXIMIZED = 3
+            SW_RESTORE = 9
+            placement = (ctypes.c_uint * 11)()
+            ctypes.windll.user32.GetWindowPlacement(hwnd, placement)
+            if int(placement[1]) == SW_SHOWMAXIMIZED:
+                ctypes.windll.user32.ShowWindow(hwnd, SW_RESTORE)
+            else:
+                ctypes.windll.user32.ShowWindow(hwnd, SW_SHOWMAXIMIZED)
+        except Exception as e:
+            print(f"Error toggling maximize: {e}")
+
+    def is_maximized(self):
+        """Returns True if the window is currently maximized."""
+        try:
+            import ctypes
+            hwnd = int(self._window.native.Handle.ToInt64())
+            SW_SHOWMAXIMIZED = 3
+            placement = (ctypes.c_uint * 11)()
+            ctypes.windll.user32.GetWindowPlacement(hwnd, placement)
+            return int(placement[1]) == SW_SHOWMAXIMIZED
+        except Exception:
+            return False
+
     def close_window(self):
         if self._window:
             self._window.destroy()

@@ -32,7 +32,7 @@
     "warn_no_cols_title": "Columnas vacias",
     "warn_no_cols_msg": "Por favor, anada al menos una columna para extraer.",
     "info_extract_done_title": "Extraccion completada",
-    "info_extract_done_msg": "¡Se han procesado {count} archivos correctamente!\n\nYa puedes guardar la informacion pulsando en 'Crear hoja de calculo'.",
+    "info_extract_done_msg": "¡Se han procesado {count} archivos correctamente!\n\nYa puedes guardar la informacion.",
     "excel_save_title": "Guardar hoja de calculo",
     "excel_filter_name": "Hoja de calculo Excel",
     "excel_success_title": "Hoja de calculo creada",

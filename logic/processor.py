@@ -15,7 +15,7 @@ def remove_accents(input_str):
 
 class FileProcessor:
     def __init__(self, strings):
-        self.api_key = "AIzaSyB-NAPti6oCfgbddVaslNM6Y2E4efaNUVw"
+        self.api_key = "AIzaSyCpnwpMVjBvQp7BTlZo_VbymIVpz7cZo-Q"
         self.s = strings
         self.client = genai.Client(api_key=self.api_key)
 

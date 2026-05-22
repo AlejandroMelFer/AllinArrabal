@@ -32,6 +32,7 @@ def main():
         js_api=api,
         width=1100,
         height=800,
+        resizable=True,
         frameless=True,
         easy_drag=False,
         min_size=(800, 600)
@@ -41,6 +42,23 @@ def main():
     def setup_resizable(win):
         try:
             hwnd = int(win.native.Handle.ToInt64())
+
+            GWL_STYLE = -16
+            WS_THICKFRAME   = 0x00040000
+            WS_MAXIMIZEBOX  = 0x00010000
+            WS_MINIMIZEBOX  = 0x00020000
+            current_style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_STYLE)
+            new_style = current_style | WS_THICKFRAME | WS_MAXIMIZEBOX | WS_MINIMIZEBOX
+            ctypes.windll.user32.SetWindowLongW(hwnd, GWL_STYLE, new_style)
+            SWP_NOMOVE = 0x0002
+            SWP_NOSIZE = 0x0001
+            SWP_NOZORDER = 0x0004
+            SWP_FRAMECHANGED = 0x0020
+            ctypes.windll.user32.SetWindowPos(
+                hwnd, None, 0, 0, 0, 0,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
+            )
+
             GWL_WNDPROC = -4
             WNDPROC = ctypes.WINFUNCTYPE(wintypes.LRESULT, wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
             

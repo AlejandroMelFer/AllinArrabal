@@ -94,7 +94,7 @@ export default function RenamePage() {
         <div className="w-8 h-8 rounded-lg overflow-hidden border border-white/10 flex items-center justify-center bg-black/20 shrink-0">
           <img src="/assets/Renombre.jpeg" alt="Renombrar" className="w-full h-full object-cover" />
         </div>
-        <h2 className="text-lg font-semibold text-text-primary">Renombrado masivo</h2>
+        <h2 className="text-lg font-semibold text-text-primary">Renombrado</h2>
       </div>
 
       <div className="bg-surface border border-border rounded-xl p-4 space-y-3">
