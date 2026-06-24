@@ -2,6 +2,8 @@
 venv/
 .venv/
 env/
+voluntario-alejandro.pem
+fastapi_server.py
 
 # Variables de entorno (SECRETOS)
 .env

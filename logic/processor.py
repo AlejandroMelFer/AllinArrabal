@@ -2,8 +2,7 @@ import os
 import time
 import json
 import threading
-from google import genai
-from PIL import Image
+import requests
 from dotenv import load_dotenv
 import unicodedata
 import zipfile
@@ -15,9 +14,9 @@ def remove_accents(input_str):
 
 class FileProcessor:
     def __init__(self, strings):
-        self.api_key = "AIzaSyCpnwpMVjBvQp7BTlZo_VbymIVpz7cZo-Q"
+        load_dotenv()
+        self.server_url = os.getenv("SERVER_URL", "http://13.36.124.182")
         self.s = strings
-        self.client = genai.Client(api_key=self.api_key)
 
     def get_unique_path(self, path):
         if not os.path.exists(path):
@@ -29,12 +28,12 @@ class FileProcessor:
             counter += 1
         return f"{base} ({counter}){ext}"
 
-    def start_processing(self, files_list, prefix, params, status_cb, finish_cb, completed_map=None):
-        thread = threading.Thread(target=self._run, args=(files_list, prefix, params, status_cb, finish_cb, completed_map))
+    def start_processing(self, files_list, prefix, params, status_cb, finish_cb, completed_map=None, email=None):
+        thread = threading.Thread(target=self._run, args=(files_list, prefix, params, status_cb, finish_cb, completed_map, email))
         thread.daemon = True
         thread.start()
 
-    def _run(self, files_list, prefix, params, status_cb, finish_cb, completed_map=None):
+    def _run(self, files_list, prefix, params, status_cb, finish_cb, completed_map=None, email=None):
         if not files_list:
             finish_cb()
             return
@@ -66,16 +65,20 @@ class FileProcessor:
                 
                 extension = os.path.splitext(filename)[1].lower()
 
-                if extension == '.pdf':
-                    with open(file_path, 'rb') as f:
-                        uploaded_file = self.client.files.upload(file=f, config={'mime_type': 'application/pdf'})
-                    response = self.client.models.generate_content(
-                        model='gemini-2.5-flash-lite',
-                        contents=[prompt, uploaded_file]
-                    )
-                text_response = response.text
-                json_str = text_response.replace('```json', '').replace('```', '').strip()
-                data = json.loads(json_str)
+                # Petición al servidor AWS para procesar el renombrado con la IA
+                url = f"{self.server_url}/ai/rename"
+                headers = {}
+                if email:
+                    headers["X-User-Email"] = email
+                with open(file_path, 'rb') as f:
+                    files = {'file': (os.path.basename(file_path), f, 'application/pdf')}
+                    data_payload = {'params_json': json.dumps(params)}
+                    r = requests.post(url, files=files, data=data_payload, headers=headers)
+                
+                if r.status_code != 200:
+                    raise Exception(f"Error del servidor API ({r.status_code}): {r.text}")
+                
+                data = r.json()
 
                 # Construir el nombre de archivo con los valores del JSON
                 values = []
@@ -132,12 +135,12 @@ class FileProcessor:
 
         finish_cb()
 
-    def start_extracting(self, files_list, params, status_cb, finish_cb):
-        thread = threading.Thread(target=self._run_extraction, args=(files_list, params, status_cb, finish_cb))
+    def start_extracting(self, files_list, params, status_cb, finish_cb, email=None):
+        thread = threading.Thread(target=self._run_extraction, args=(files_list, params, status_cb, finish_cb, email))
         thread.daemon = True
         thread.start()
 
-    def _run_extraction(self, files_list, params, status_cb, finish_cb):
+    def _run_extraction(self, files_list, params, status_cb, finish_cb, email=None):
         if not files_list:
             finish_cb([])
             return
@@ -160,19 +163,20 @@ class FileProcessor:
                 json_keys_str = ", ".join([f'"{p}": "..."' for p in params])
                 prompt = self.s["ai_prompt_extraccion"].format(fields=fields_str, json_keys=json_keys_str)
 
-                # 2. Subir PDF a Gemini
+                # Petición al servidor AWS para extraer los datos con la IA
+                url = f"{self.server_url}/ai/extract"
+                headers = {}
+                if email:
+                    headers["X-User-Email"] = email
                 with open(file_path, 'rb') as f:
-                    uploaded_file = self.client.files.upload(file=f, config={'mime_type': 'application/pdf'})
+                    files = {'file': (os.path.basename(file_path), f, 'application/pdf')}
+                    data_payload = {'params_json': json.dumps(params)}
+                    r = requests.post(url, files=files, data=data_payload, headers=headers)
 
-                # 3. Llamar al modelo de IA
-                response = self.client.models.generate_content(
-                    model='gemini-2.5-flash-lite',
-                    contents=[prompt, uploaded_file]
-                )
-
-                text_response = response.text
-                json_str = text_response.replace('```json', '').replace('```', '').strip()
-                data = json.loads(json_str)
+                if r.status_code != 200:
+                    raise Exception(f"Error del servidor API ({r.status_code}): {r.text}")
+                
+                data = r.json()
 
                 # Guardar fila de datos en memoria (manteniendo acentos originales)
                 row_data = {}

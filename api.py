@@ -18,6 +18,8 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
+import requests
+
 class AllinArrabalAPI:
     def __init__(self):
         path = resource_path("strings.json")
@@ -27,6 +29,8 @@ class AllinArrabalAPI:
         self._progress_queue = queue.Queue()
         self._window = None
         self._extracted_rows = []
+        self._user_email = None
+        self._auth_type = None
 
     def set_window(self, window):
         self._window = window
@@ -86,7 +90,8 @@ class AllinArrabalAPI:
             files, prefix, params,
             self._status_cb,
             self._finish_cb_rename,
-            completed_map
+            completed_map,
+            email=self._user_email
         )
         return {"status": "started"}
 
@@ -101,7 +106,8 @@ class AllinArrabalAPI:
         self._processor.start_extracting(
             remaining_files, columns,
             self._status_cb,
-            self._finish_cb_extract
+            self._finish_cb_extract,
+            email=self._user_email
         )
         return {"status": "started"}
 
@@ -116,7 +122,8 @@ class AllinArrabalAPI:
         self._processor.start_extracting(
             remaining_files, columns,
             self._status_cb,
-            self._finish_cb_extract
+            self._finish_cb_extract,
+            email=self._user_email
         )
         return {"status": "started"}
 
@@ -205,3 +212,29 @@ class AllinArrabalAPI:
     def close_window(self):
         if self._window:
             self._window.destroy()
+
+    # ── Authentication ──────────────────────────────────────────
+    def authenticate_user(self, email):
+        try:
+            url = f"{self._processor.server_url}/ai/auth"
+            r = requests.post(url, json={"email": email}, timeout=10)
+            if r.status_code == 200:
+                data = r.json()
+                if data.get("success"):
+                    self.set_user_session(email, "company")
+                    return {"success": True, "role": "company", "email": email}
+                else:
+                    return {"success": False, "error": data.get("message", "El correo no es corporativo")}
+            else:
+                return {"success": False, "error": f"Error del servidor ({r.status_code})"}
+        except Exception as e:
+            return {"success": False, "error": f"No se pudo conectar al servidor: {e}"}
+
+    def set_guest_session(self):
+        self.set_user_session("guest", "guest")
+        return {"success": True, "role": "guest", "email": "guest"}
+
+    def set_user_session(self, email, auth_type):
+        self._user_email = email
+        self._auth_type = auth_type
+        return {"status": "ok"}
