@@ -18,18 +18,13 @@ export function Login({ onLoginSuccess, api }: LoginProps) {
     setError(null);
 
     const emailTrimmed = email.trim();
-    if (!emailTrimmed.toLowerCase().endsWith('@arrabalempleo.org')) {
-      setError('El correo introducido no tiene acceso corporativo o no es válido. Si no dispones de uno, pulsa "Acceder como invitado" abajo.');
-      setLoading(false);
-      return;
-    }
 
     try {
       const res = await api?.authenticate_user?.(emailTrimmed);
       if (res && res.success) {
         onLoginSuccess(res.email, res.role);
       } else {
-        setError(res?.error || 'Error al validar el correo.');
+        setError(res?.error || 'El correo introducido no figura como usuario activo registrado. Si no dispones de cuenta, pulsa "Acceder como invitado".');
       }
     } catch (err: any) {
       setError(err?.message || 'Error de conexión con el servidor.');
@@ -69,7 +64,7 @@ export function Login({ onLoginSuccess, api }: LoginProps) {
           <div>
             <h2 className="text-xl font-bold tracking-tight text-text-primary">Iniciar Sesión</h2>
             <p className="text-xs text-text-secondary mt-1 max-w-[280px]">
-              Introduce tu correo corporativo de Arrabal Empleo o accede de forma gratuita como invitado.
+              Introduce tu correo de usuario registrado en Arrabal o accede como invitado.
             </p>
           </div>
         </div>
