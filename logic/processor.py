@@ -3,6 +3,7 @@ import time
 import json
 import threading
 import requests
+import mimetypes
 from dotenv import load_dotenv
 import unicodedata
 import zipfile
@@ -70,8 +71,9 @@ class FileProcessor:
                 headers = {}
                 if email:
                     headers["X-User-Email"] = email
+                mime_type = mimetypes.guess_type(file_path)[0] or 'application/octet-stream'
                 with open(file_path, 'rb') as f:
-                    files = {'file': (os.path.basename(file_path), f, 'application/pdf')}
+                    files = {'file': (os.path.basename(file_path), f, mime_type)}
                     data_payload = {'params_json': json.dumps(params)}
                     r = requests.post(url, files=files, data=data_payload, headers=headers)
                 
@@ -168,8 +170,9 @@ class FileProcessor:
                 headers = {}
                 if email:
                     headers["X-User-Email"] = email
+                mime_type = mimetypes.guess_type(file_path)[0] or 'application/octet-stream'
                 with open(file_path, 'rb') as f:
-                    files = {'file': (os.path.basename(file_path), f, 'application/pdf')}
+                    files = {'file': (os.path.basename(file_path), f, mime_type)}
                     data_payload = {'params_json': json.dumps(params)}
                     r = requests.post(url, files=files, data=data_payload, headers=headers)
 

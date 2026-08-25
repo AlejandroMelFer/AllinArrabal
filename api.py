@@ -47,7 +47,12 @@ class AllinArrabalAPI:
         result = self._window.create_file_dialog(
             webview.OPEN_DIALOG,
             allow_multiple=True,
-            file_types=("PDF files (*.pdf)",)
+            file_types=(
+                "Archivos soportados (*.pdf;*.jpg;*.jpeg;*.png)",
+                "Documentos PDF (*.pdf)",
+                "Imagenes JPG y PNG (*.jpg;*.jpeg;*.png)",
+                "Todos los archivos (*.*)"
+            )
         )
         return list(result) if result else []
 
