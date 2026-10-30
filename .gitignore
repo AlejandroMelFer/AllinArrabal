@@ -21,3 +21,7 @@ build/
 # Depuración de Word
 debug_table.txt
 
+Dockerfile
+.dockerignore
+requirements-api.txt
+
