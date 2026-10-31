@@ -1,0 +1,7 @@
+fastapi==0.137.1
+uvicorn==0.49.0
+slowapi==0.1.10
+python-multipart==0.0.32
+google-genai==2.8.0
+python-dotenv==1.2.2
+requests==2.34.2

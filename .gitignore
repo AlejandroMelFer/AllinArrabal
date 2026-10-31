@@ -3,7 +3,6 @@ venv/
 .venv/
 env/
 voluntario-alejandro.pem
-fastapi_server.py
 
 # Variables de entorno (SECRETOS)
 .env
@@ -21,7 +20,5 @@ build/
 # Depuración de Word
 debug_table.txt
 
-Dockerfile
 .dockerignore
-requirements-api.txt
 
